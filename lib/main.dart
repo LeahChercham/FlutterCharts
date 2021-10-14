@@ -39,12 +39,11 @@ class Product {
 }
 
 class ChartScreen extends State<MainPage> {
-
   String letters = "ABCDEFGH";
   List<Product> products = [];
   bool animate = false;
 
-  void createProducts() {
+  void createProducts() { 
     letters.split("").forEach(
         (letter) => {products.add(Product(letter, randomValue(0, 100)))});
   }
@@ -53,29 +52,61 @@ class ChartScreen extends State<MainPage> {
 
   @override
   void initState() {
-    createProducts();
+    createProducts(); // every App start create a product with random value
     super.initState();
   }
 
-
-  Random _randomNumber = new Random();
+  Random randomNumber = new Random(); // Random number generation
   int randomValue(int min, int max) {
-    return min + _randomNumber.nextInt(max - min);
+    return min + randomNumber.nextInt(max - min);
   }
 
   @override
   Widget build(BuildContext context) {
+
+    // Chart
     var series = [
       new charts.Series<Product, String>(
-        id: 'Product',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (Product product, _) => product.name,
-        measureFn: (Product product, _) => product.price,
-        data: products,
-      )
+          id: 'Product',
+          colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+          domainFn: (Product product, _) => product.name,
+          measureFn: (Product product, _) => product.price,
+          data: products)
     ];
-    var chart = new charts.BarChart(series, animate:false);
+    var chart = new charts.BarChart(
+      series,
+      animate: false,
+      primaryMeasureAxis: new charts.NumericAxisSpec( 
+        tickProviderSpec: new charts.StaticNumericTickProviderSpec( // Static: always show y-axis labels up to 100  
+          <charts.TickSpec<num>>[
+            charts.TickSpec<num>(0),
+            charts.TickSpec<num>(10),
+            charts.TickSpec<num>(20),
+            charts.TickSpec<num>(30),
+            charts.TickSpec<num>(40),
+            charts.TickSpec<num>(50),
+            charts.TickSpec<num>(60),
+            charts.TickSpec<num>(70),
+            charts.TickSpec<num>(80),
+            charts.TickSpec<num>(90),
+            charts.TickSpec<num>(100),
+          ],
+        ),
+      ),
+    );
 
-    return SafeArea(child: Scaffold(body: chart));
+    return SafeArea( // rendering
+        child: Scaffold(
+            appBar: AppBar(title: Text(widget.title)),
+            body: Padding(
+                padding: EdgeInsets.only(
+                    left: 20.0, top: 20.0, right: 20.0, bottom: 100.0),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text("Gesamtverkäufe"),
+                      Expanded(child: chart)
+                    ]))));
   }
 }
